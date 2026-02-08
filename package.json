@@ -1,0 +1,8 @@
+{
+  "name": "precificacao",
+  "version": "1.0.0",
+  "description": "Planilha de precificação com CRUD de itens e SQLite",
+  "scripts": {
+    "start": "python3 server.py"
+  }
+}
