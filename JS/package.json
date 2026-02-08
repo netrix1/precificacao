@@ -1,0 +1,8 @@
+{
+  "name": "precificacao-js-puro",
+  "version": "1.0.0",
+  "description": "Versão JS puro (sem libs externas no backend)",
+  "scripts": {
+    "start": "node server.js"
+  }
+}

@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Planilha de Precificação</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body class="bg-slate-100 min-h-screen text-slate-900">
+  <main class="max-w-6xl mx-auto px-4 py-8">
+    <header class="mb-8">
+      <h1 class="text-3xl font-bold">Planilha de Precificação</h1>
+      <p class="text-slate-600 mt-2">Monte sua precificação adicionando itens e quantidades para calcular custos automaticamente.</p>
+    </header>
+
+    <section class="bg-white rounded-xl shadow p-6 mb-6 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+      <div>
+        <h2 class="text-lg font-semibold">Cadastro de itens</h2>
+        <p class="text-slate-600 text-sm mt-1">Gerencie ingredientes, mão de obra e outros custos na tabela de itens.</p>
+      </div>
+      <button id="open-modal" type="button" class="w-fit bg-slate-800 text-white rounded-lg px-4 py-2 hover:bg-slate-900">Ver Tabela de Itens</button>
+    </section>
+
+    <section class="bg-white rounded-xl shadow p-6 mb-6">
+      <h2 class="text-xl font-semibold mb-4">Adicionar item ao cálculo</h2>
+      <form id="calc-form" class="grid md:grid-cols-5 gap-3 items-end">
+        <div class="md:col-span-2">
+          <label for="calc-item" class="block text-sm font-medium mb-1">Item cadastrado</label>
+          <select id="calc-item" required class="w-full border rounded-lg px-3 py-2"></select>
+        </div>
+        <div>
+          <label for="calc-quantidade" class="block text-sm font-medium mb-1">Quantidade usada</label>
+          <input id="calc-quantidade" type="number" min="0" step="0.01" required class="w-full border rounded-lg px-3 py-2" />
+        </div>
+        <div>
+          <label for="calc-observacao" class="block text-sm font-medium mb-1">Observação</label>
+          <input id="calc-observacao" type="text" placeholder="Opcional" class="w-full border rounded-lg px-3 py-2" />
+        </div>
+        <button type="submit" class="bg-blue-600 text-white rounded-lg px-4 py-2 hover:bg-blue-700">Adicionar</button>
+      </form>
+    </section>
+
+    <section class="bg-white rounded-xl shadow p-6 mb-6">
+      <h2 class="text-xl font-semibold mb-4">Itens no cálculo atual</h2>
+      <div class="overflow-x-auto">
+        <table class="min-w-full text-sm">
+          <thead>
+            <tr class="border-b">
+              <th class="text-left py-2">Item</th>
+              <th class="text-left py-2">Categoria</th>
+              <th class="text-left py-2">Qtd. usada</th>
+              <th class="text-left py-2">Custo unitário</th>
+              <th class="text-left py-2">Subtotal</th>
+              <th class="text-left py-2">Obs.</th>
+              <th class="text-left py-2">Ações</th>
+            </tr>
+          </thead>
+          <tbody id="calculation-body"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="bg-white rounded-xl shadow p-6">
+      <div class="flex flex-col md:flex-row md:justify-between md:items-start gap-4 mb-4">
+        <h2 class="text-lg font-semibold">Resumo dos custos</h2>
+        <button id="generate-report" type="button" class="bg-emerald-600 text-white rounded-lg px-4 py-2 hover:bg-emerald-700">Gerar um relatório (PDF)</button>
+      </div>
+      <div class="space-y-3 text-sm">
+        <div class="flex justify-between"><span>Total ingredientes</span><strong id="total-ingredientes">R$ 0,00</strong></div>
+        <div class="flex justify-between"><span>Total mão de obra</span><strong id="total-mao-obra">R$ 0,00</strong></div>
+        <div class="flex justify-between"><span>Total outros custos</span><strong id="total-outros">R$ 0,00</strong></div>
+        <hr />
+        <div class="flex justify-between text-base"><span>Total geral</span><strong id="total-geral">R$ 0,00</strong></div>
+      </div>
+    </section>
+  </main>
+
+  <div id="items-modal" class="hidden fixed inset-0 bg-black/50 p-4 z-40">
+    <div class="bg-white rounded-xl max-w-5xl w-full mx-auto mt-8 p-6 max-h-[90vh] overflow-y-auto">
+      <div class="flex justify-between items-start mb-4">
+        <div>
+          <h3 class="text-xl font-semibold">Tabela de Itens</h3>
+          <p class="text-sm text-slate-600">CRUD dos itens cadastrados no SQLite.</p>
+        </div>
+        <button id="close-modal" type="button" class="text-slate-500 hover:text-slate-800">✕</button>
+      </div>
+
+      <form id="item-form" class="grid md:grid-cols-6 gap-3 items-end border rounded-lg p-4 bg-slate-50 mb-4">
+        <input id="item-id" type="hidden" />
+        <div class="md:col-span-2">
+          <label class="block text-sm font-medium mb-1" for="item-nome">Nome</label>
+          <input id="item-nome" required class="w-full border rounded-lg px-3 py-2" />
+        </div>
+        <div>
+          <label class="block text-sm font-medium mb-1" for="item-categoria">Categoria</label>
+          <select id="item-categoria" class="w-full border rounded-lg px-3 py-2">
+            <option value="ingrediente">Ingrediente</option>
+            <option value="mao_de_obra">Mão de obra</option>
+            <option value="outros_custos">Outros custos</option>
+          </select>
+        </div>
+        <div>
+          <label class="block text-sm font-medium mb-1" for="item-quantidade-base">Qtd. base</label>
+          <input id="item-quantidade-base" type="number" min="0" step="0.01" required class="w-full border rounded-lg px-3 py-2" />
+        </div>
+        <div>
+          <label class="block text-sm font-medium mb-1" for="item-tipo-quantidade">Tipo (kg, L, h...)</label>
+          <input id="item-tipo-quantidade" required class="w-full border rounded-lg px-3 py-2" />
+        </div>
+        <div>
+          <label class="block text-sm font-medium mb-1" for="item-preco">Preço por quantidade</label>
+          <input id="item-preco" type="number" min="0" step="0.01" required class="w-full border rounded-lg px-3 py-2" />
+        </div>
+        <div class="md:col-span-6 flex gap-2">
+          <button type="submit" class="bg-green-600 text-white rounded-lg px-4 py-2 hover:bg-green-700">Salvar item</button>
+          <button id="cancel-edit" type="button" class="bg-slate-300 rounded-lg px-4 py-2 hover:bg-slate-400">Limpar</button>
+        </div>
+      </form>
+
+      <div class="overflow-x-auto">
+        <table class="min-w-full text-sm">
+          <thead>
+            <tr class="border-b">
+              <th class="text-left py-2">Nome</th>
+              <th class="text-left py-2">Categoria</th>
+              <th class="text-left py-2">Qtd. base</th>
+              <th class="text-left py-2">Tipo</th>
+              <th class="text-left py-2">Preço</th>
+              <th class="text-left py-2">Ações</th>
+            </tr>
+          </thead>
+          <tbody id="items-body"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
