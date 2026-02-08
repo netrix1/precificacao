@@ -1,0 +1,12 @@
+body {
+  font-family: Inter, system-ui, -apple-system, sans-serif;
+}
+
+th,
+td {
+  padding-right: 0.5rem;
+}
+
+.modal-open {
+  overflow: hidden;
+}
