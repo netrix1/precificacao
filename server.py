@@ -8,6 +8,48 @@ ROOT = Path(__file__).resolve().parent
 DB_PATH = ROOT / "precificacao.db"
 PORT = 3000
 
+DEFAULT_ITEMS = [
+    ("Abacaxi", "ingrediente", 1250, "g", 10.00),
+    ("Achocolatado", "ingrediente", 370, "g", 7.80),
+    ("Açúcar cristal", "ingrediente", 1000, "g", 3.72),
+    ("Açúcar de confeiteiro", "ingrediente", 500, "g", 4.00),
+    ("Açúcar demerara", "ingrediente", 1000, "g", 5.00),
+    ("Açúcar refinado", "ingrediente", 1000, "g", 4.00),
+    ("Amido de milho", "ingrediente", 200, "g", 7.00),
+    ("Bicarbonato de sódio", "ingrediente", 500, "g", 10.55),
+    ("Biscoito maisena", "ingrediente", 400, "g", 9.00),
+    ("Cacau em pó", "ingrediente", 250, "g", 10.00),
+    ("Canela em pó", "ingrediente", 50, "g", 5.00),
+    ("Cenoura", "ingrediente", 1000, "g", 11.00),
+    ("Chantilly", "ingrediente", 1000, "g", 12.00),
+    ("Chocolate ao leite", "ingrediente", 380, "g", 13.00),
+    ("Chocolate branco", "ingrediente", 1000, "g", 14.00),
+    ("Chocolate em pó", "ingrediente", 1000, "g", 26.00),
+    ("Chocolate meio amargo", "ingrediente", 1000, "g", 16.00),
+    ("Coco ralado", "ingrediente", 100, "g", 17.00),
+    ("Confeitos", "ingrediente", 100, "g", 18.00),
+    ("Cravo em pó", "ingrediente", 250, "g", 7.29),
+    ("Creme de leite", "ingrediente", 200, "g", 19.00),
+    ("Doce de leite", "ingrediente", 395, "g", 20.00),
+    ("Doce de leite Itambé", "ingrediente", 395, "g", 9.85),
+    ("Essência de baunilha", "ingrediente", 30, "ml", 21.00),
+    ("Farinha de trigo", "ingrediente", 1000, "g", 4.00),
+    ("Fermento em pó", "ingrediente", 100, "g", 2.50),
+    ("Granulado", "ingrediente", 50, "g", 24.00),
+    ("Leite", "ingrediente", 1000, "ml", 300.00),
+    ("Leite condensado", "ingrediente", 395, "g", 4.50),
+    ("Leite de coco", "ingrediente", 400, "ml", 27.00),
+    ("Leite em pó", "ingrediente", 400, "g", 28.00),
+    ("Limão", "ingrediente", 1000, "g", 29.00),
+    ("Mel", "ingrediente", 1000, "g", 38.00),
+    ("Manteiga", "ingrediente", 200, "g", 7.00),
+    ("Morango", "ingrediente", 1000, "g", 32.00),
+    ("Nutella", "ingrediente", 400, "g", 33.00),
+    ("Óleo", "ingrediente", 900, "ml", 7.00),
+    ("Ovos (em unidades)", "ingrediente", 20, "un", 17.90),
+    ("Laranja", "ingrediente", 1000, "g", 2.00),
+]
+
 
 def init_db():
     with sqlite3.connect(DB_PATH) as conn:
@@ -23,6 +65,15 @@ def init_db():
             )
             """
         )
+        existing_count = conn.execute("SELECT COUNT(*) FROM items").fetchone()[0]
+        if existing_count == 0:
+            conn.executemany(
+                """
+                INSERT INTO items (nome, categoria, quantidade_base, tipo_quantidade, preco_por_quantidade)
+                VALUES (?, ?, ?, ?, ?)
+                """,
+                DEFAULT_ITEMS,
+            )
 
 
 def validate_item(item):

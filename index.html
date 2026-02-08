@@ -14,6 +14,14 @@
       <p class="text-slate-600 mt-2">Monte sua precificação adicionando itens e quantidades para calcular custos automaticamente.</p>
     </header>
 
+    <section class="bg-white rounded-xl shadow p-6 mb-6 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+      <div>
+        <h2 class="text-lg font-semibold">Cadastro de itens</h2>
+        <p class="text-slate-600 text-sm mt-1">Gerencie ingredientes, mão de obra e outros custos na tabela de itens.</p>
+      </div>
+      <button id="open-modal" type="button" class="w-fit bg-slate-800 text-white rounded-lg px-4 py-2 hover:bg-slate-900">Ver Tabela de Itens</button>
+    </section>
+
     <section class="bg-white rounded-xl shadow p-6 mb-6">
       <h2 class="text-xl font-semibold mb-4">Adicionar item ao cálculo</h2>
       <form id="calc-form" class="grid md:grid-cols-5 gap-3 items-end">
@@ -33,28 +41,7 @@
       </form>
     </section>
 
-    <section class="grid md:grid-cols-2 gap-6 mb-6">
-      <article class="bg-white rounded-xl shadow p-6">
-        <h2 class="text-lg font-semibold mb-4">Resumo dos custos</h2>
-        <div class="space-y-3 text-sm">
-          <div class="flex justify-between"><span>Total ingredientes</span><strong id="total-ingredientes">R$ 0,00</strong></div>
-          <div class="flex justify-between"><span>Total mão de obra</span><strong id="total-mao-obra">R$ 0,00</strong></div>
-          <div class="flex justify-between"><span>Total outros custos</span><strong id="total-outros">R$ 0,00</strong></div>
-          <hr />
-          <div class="flex justify-between text-base"><span>Total geral</span><strong id="total-geral">R$ 0,00</strong></div>
-        </div>
-      </article>
-
-      <article class="bg-white rounded-xl shadow p-6 flex flex-col justify-between gap-4">
-        <div>
-          <h2 class="text-lg font-semibold">Cadastro de itens</h2>
-          <p class="text-slate-600 text-sm mt-2">Gerencie ingredientes, mão de obra e outros custos na tabela de itens.</p>
-        </div>
-        <button id="open-modal" type="button" class="w-fit bg-slate-800 text-white rounded-lg px-4 py-2 hover:bg-slate-900">Ver Tabela de Itens</button>
-      </article>
-    </section>
-
-    <section class="bg-white rounded-xl shadow p-6">
+    <section class="bg-white rounded-xl shadow p-6 mb-6">
       <h2 class="text-xl font-semibold mb-4">Itens no cálculo atual</h2>
       <div class="overflow-x-auto">
         <table class="min-w-full text-sm">
@@ -71,6 +58,20 @@
           </thead>
           <tbody id="calculation-body"></tbody>
         </table>
+      </div>
+    </section>
+
+    <section class="bg-white rounded-xl shadow p-6">
+      <div class="flex flex-col md:flex-row md:justify-between md:items-start gap-4 mb-4">
+        <h2 class="text-lg font-semibold">Resumo dos custos</h2>
+        <button id="generate-report" type="button" class="bg-emerald-600 text-white rounded-lg px-4 py-2 hover:bg-emerald-700">Gerar um relatório (PDF)</button>
+      </div>
+      <div class="space-y-3 text-sm">
+        <div class="flex justify-between"><span>Total ingredientes</span><strong id="total-ingredientes">R$ 0,00</strong></div>
+        <div class="flex justify-between"><span>Total mão de obra</span><strong id="total-mao-obra">R$ 0,00</strong></div>
+        <div class="flex justify-between"><span>Total outros custos</span><strong id="total-outros">R$ 0,00</strong></div>
+        <hr />
+        <div class="flex justify-between text-base"><span>Total geral</span><strong id="total-geral">R$ 0,00</strong></div>
       </div>
     </section>
   </main>

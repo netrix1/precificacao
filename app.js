@@ -1,6 +1,12 @@
 const state = {
   items: [],
-  calculationRows: []
+  calculationRows: [],
+  totals: {
+    ingrediente: 0,
+    mao_de_obra: 0,
+    outros_custos: 0,
+    geral: 0
+  }
 };
 
 const modal = document.getElementById('items-modal');
@@ -117,6 +123,11 @@ function renderTotals() {
 
   const totalGeral = totals.ingrediente + totals.mao_de_obra + totals.outros_custos;
 
+  state.totals = {
+    ...totals,
+    geral: totalGeral
+  };
+
   document.getElementById('total-ingredientes').textContent = formatCurrency(totals.ingrediente);
   document.getElementById('total-mao-obra').textContent = formatCurrency(totals.mao_de_obra);
   document.getElementById('total-outros').textContent = formatCurrency(totals.outros_custos);
@@ -140,6 +151,92 @@ function resetItemForm() {
   document.getElementById('item-quantidade-base').value = '';
   document.getElementById('item-tipo-quantidade').value = '';
   document.getElementById('item-preco').value = '';
+}
+
+function validateCategoriesBeforeReport() {
+  if (state.calculationRows.length === 0) {
+    alert('Adicione itens ao cálculo antes de gerar o relatório.');
+    return false;
+  }
+
+  if (state.totals.mao_de_obra <= 0) {
+    alert('Atenção: você não adicionou nenhum item de mão de obra ao cálculo.');
+    return false;
+  }
+
+  if (state.totals.outros_custos <= 0) {
+    alert('Atenção: você não adicionou nenhum item de outros custos ao cálculo.');
+    return false;
+  }
+
+  return true;
+}
+
+function generatePdfReport() {
+  if (!validateCategoriesBeforeReport()) {
+    return;
+  }
+
+  const now = new Date();
+  const dateStr = now.toLocaleString('pt-BR');
+  const rows = state.calculationRows
+    .map(
+      (row) => `
+      <tr>
+        <td>${row.item.nome}</td>
+        <td>${formatCategoria(row.item.categoria)}</td>
+        <td>${row.quantidadeUsada} ${row.item.tipo_quantidade}</td>
+        <td>${formatCurrency(row.custoUnitario)}</td>
+        <td>${formatCurrency(row.subtotal)}</td>
+      </tr>`
+    )
+    .join('');
+
+  const reportWindow = window.open('', '_blank');
+  reportWindow.document.write(`
+    <html lang="pt-BR">
+      <head>
+        <title>Relatório de Precificação</title>
+        <style>
+          body { font-family: Arial, sans-serif; padding: 24px; }
+          h1 { margin-bottom: 8px; }
+          p { color: #374151; margin-top: 0; }
+          table { width: 100%; border-collapse: collapse; margin-top: 12px; }
+          th, td { border: 1px solid #d1d5db; padding: 8px; text-align: left; font-size: 12px; }
+          th { background: #f3f4f6; }
+          .totals { margin-top: 20px; width: 320px; }
+          .totals div { display: flex; justify-content: space-between; margin-bottom: 6px; font-size: 14px; }
+          .total { font-weight: 700; border-top: 1px solid #111827; padding-top: 8px; margin-top: 8px; }
+        </style>
+      </head>
+      <body>
+        <h1>Relatório de Precificação</h1>
+        <p>Gerado em: ${dateStr}</p>
+        <table>
+          <thead>
+            <tr>
+              <th>Item</th>
+              <th>Categoria</th>
+              <th>Quantidade usada</th>
+              <th>Custo unitário</th>
+              <th>Subtotal</th>
+            </tr>
+          </thead>
+          <tbody>${rows}</tbody>
+        </table>
+
+        <section class="totals">
+          <div><span>Total ingredientes</span><strong>${formatCurrency(state.totals.ingrediente)}</strong></div>
+          <div><span>Total mão de obra</span><strong>${formatCurrency(state.totals.mao_de_obra)}</strong></div>
+          <div><span>Total outros custos</span><strong>${formatCurrency(state.totals.outros_custos)}</strong></div>
+          <div class="total"><span>Total geral</span><strong>${formatCurrency(state.totals.geral)}</strong></div>
+        </section>
+      </body>
+    </html>
+  `);
+  reportWindow.document.close();
+  reportWindow.focus();
+  reportWindow.print();
 }
 
 itemForm.addEventListener('submit', async (event) => {
@@ -245,6 +342,7 @@ document.getElementById('calculation-body').addEventListener('click', (event) =>
 document.getElementById('open-modal').addEventListener('click', openModal);
 document.getElementById('close-modal').addEventListener('click', closeModal);
 document.getElementById('cancel-edit').addEventListener('click', resetItemForm);
+document.getElementById('generate-report').addEventListener('click', generatePdfReport);
 modal.addEventListener('click', (event) => {
   if (event.target === modal) closeModal();
 });
